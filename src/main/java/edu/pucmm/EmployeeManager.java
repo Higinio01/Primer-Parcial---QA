@@ -62,13 +62,32 @@ public class EmployeeManager {
         if (!employees.contains(employee)) {
             throw new EmployeeNotFoundException("Employee not found");
         }
-        if (!isSalaryValidForPosition(newPosition, employee.getSalary())) {
-            throw new InvalidSalaryException("Current salary is not within the range for the new position");
+
+        double salary = employee.getSalary();
+        if (!isSalaryValidForPosition(newPosition, salary)) {
+
+            if (salary >= newPosition.getMinSalary() * 0.9 && salary < newPosition.getMinSalary()) {
+                employee.setSalary(newPosition.getMinSalary());
+            } else {
+                throw new InvalidSalaryException("Current salary is not within the range for the new position");
+            }
         }
         employee.setPosition(newPosition);
     }
 
     public boolean isSalaryValidForPosition(Position position, double salary) {
+        if (position == null || salary < 0) {
+            return false;
+        }
+
+        double minAllowed = position.getMinSalary() * 0.9;
+        if (salary < minAllowed) {
+            return false;
+        }
+
         return salary >= position.getMinSalary() && salary <= position.getMaxSalary();
     }
+
+
+
 }
