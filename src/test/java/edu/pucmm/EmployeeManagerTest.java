@@ -216,5 +216,44 @@ public class EmployeeManagerTest {
         boolean result = employeeManager.isSalaryValidForPosition(juniorDeveloper, salary);
         assertEquals(expected, result,
                 "La validación del salario " + salary + " no fue la esperada");
+
     }
+
+    @Test
+    public void testSalaryNegativeReturnsFalseInValidation() {
+        boolean isValid = employeeManager.isSalaryValidForPosition(juniorDeveloper, -10000);
+        assertFalse(isValid, "Un salario negativo no debe ser válido para ninguna posición");
+    }
+
+    @Test
+    public void testNullPositionReturnsFalseInValidation() {
+        boolean isValid = employeeManager.isSalaryValidForPosition(null, 40000);
+        assertFalse(isValid, "Una posición nula no debe ser válida para ninguna validación de salario");
+    }
+
+    @Test
+    public void testSalaryBelow10PercentThresholdIsInvalid() {
+        double salaryBelowThreshold = juniorDeveloper.getMinSalary() * 0.89;
+        Employee underpaid = new Employee("99", "Undervalued", juniorDeveloper, salaryBelowThreshold);
+
+        assertThrows(InvalidSalaryException.class, () -> {
+            employeeManager.addEmployee(underpaid);
+        }, "Debe lanzarse InvalidSalaryException si el salario está más de un 10% por debajo del mínimo");
+    }
+
+    @Test
+    public void testUpdatePositionAdjustsSalaryIfWithin10PercentRange() {
+        double initialSalary = 54000;
+
+        Position customJunior = new Position("3", "Custom Junior", 50000, 60000);
+        Employee flexible = new Employee("55", "Flexible Salary", customJunior, initialSalary);
+        employeeManager.addEmployee(flexible);
+
+        employeeManager.updateEmployeePosition(flexible, seniorDeveloper);
+
+        assertEquals(seniorDeveloper, flexible.getPosition(), "La posición debe actualizarse correctamente");
+        assertEquals(seniorDeveloper.getMinSalary(), flexible.getSalary(), "El salario debe ajustarse al mínimo");
+    }
+
+
 }
