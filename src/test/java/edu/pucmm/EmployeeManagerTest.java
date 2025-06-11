@@ -215,6 +215,6 @@ public class EmployeeManagerTest {
     public void testIsSalaryValidForJuniorPositionParameterized(double salary, boolean expected) {
         boolean result = employeeManager.isSalaryValidForPosition(juniorDeveloper, salary);
         assertEquals(expected, result,
-                "La validación del salario " + salary + " para Junior Developer no fue la esperada");
+                "La validación del salario " + salary + " no fue la esperada");
     }
 }
